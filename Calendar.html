@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #e0e0e0;
+  margin: 0;
+}
+.calendar-container {
+  width: 320px;
+  height: 480px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.input-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+
+}
+input {
+  padding: 10px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #5bb7c9;
+  width: 90%;
+  text-align: center;
+  cursor: pointer;
+  background: #f9f9f9;
+
+}
+.festival-display {
+  font-size: 13px;
+  color: #ff4500;
+  margin-top: 4px;
+  min-height: 18px;
+  text-align: center;
+}
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 6px;
+  font-size: 16px;
+  background: #f4f4f4;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.arrow-btn {
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  padding: 4px 6px;
+  transition: 0.2s;
+}
+.arrow-btn:hover {
+  color: #fc9c6e; 
+  transform: scale(1.2);
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  flex-grow: 1;
+  box-sizing: border-box;
+}
+.day-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: #555;
+}
+.day {
+  text-align: center;
+  padding: 6px 2px;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #f9f9f9;
+  cursor: pointer;
+  min-height: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  transition: 0.2s;
+}
+.day:hover {
+  background: #e0e0e0;
+}
+.festival {
+  font-size: 10px;
+  color: #ff4500;
+  margin-top: 2px;
+  display: block;
+}
+.selected {
+  background: #9f3030;
+  color: #fff;
+}
+.calendar-icon {
+  position: absolute;
+  /* transform: translateY(-50%); */
+  font-size: 18px;
+  color: #888;
+  margin-left: 60px;
+}
+</style>
+</head>
+<body>
+<div class="calendar-container">
+  <div class="input-box">
+    <input type="text" id="dateInput" placeholder="📅Select Date" readonly />
+    <div id="festivalInfo" class="festival-display"></div>
+  </div>
+  <div class="calendar">
+    <div class="calendar-header">
+      <span id="prevMonth" class="arrow-btn">&lt;&lt;</span>
+      <span class="calendar-icon">📅</span>
+      <span id="monthTitle">September 2025</span>
+      <span id="nextMonth" class="arrow-btn">&gt;&gt;</span>
+    </div>
+    <div id="calendarDays" class="calendar-grid"></div>
+  </div>
+</div>
+<script>
+const monthTitle = document.getElementById("monthTitle");
+const calendarDays = document.getElementById("calendarDays");
+const dateInput = document.getElementById("dateInput");
+const festivalInfo = document.getElementById("festivalInfo");
+let currentMonthIndex = 0;
+const months = [
+  // September 2025
+  { 
+    name: "September 2025", 
+    days: [null,null,null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    festivals: {
+      5: "Ganesh Chaturthi",
+      22: "Navratri Start",
+    }
+  },
+  // October 2025
+  { 
+    name: "October 2025", 
+    days: [null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+    festivals: {
+      2: "Vijayadashami / Dussehra",
+      19: "Diwali",
+      20: "Lakshmi puja",
+      22: "Govardhan Puja",
+      23: "Bhai Dooj",
+    }
+  },
+  // November 2025
+  { 
+    name: "November 2025", 
+    days: [null,null,null,null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    festivals: {
+    }
+  },
+  // December 2025
+  { 
+    name: "December 2025", 
+    days: [null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+    festivals: {
+      25: "Christmas"
+    }
+  },
+  // January 2026
+  { 
+    name: "January 2026", 
+    days: [null,null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+    festivals: {
+      1: "New Year",
+      14: "Makar Sankranti",
+      26: "Republic Day"
+    }
+  },
+  // February 2026
+  { 
+    name: "February 2026", 
+    days: [null,null,null,null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
+    festivals: {
+      15: "Maha Shivaratri"
+    }
+  },
+  // March 2026
+  { 
+    name: "March 2026", 
+    days: [null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31], 
+    festivals: {
+      4: "Holi",
+      26: "Ram Navami",
+    } 
+  }
+];
+function generateCalendar(i){
+  calendarDays.innerHTML = `<div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>`;
+  const month = months[i]; monthTitle.textContent = month.name;
+
+  month.days.forEach(d=>{
+    const dayDiv = document.createElement("div");
+    if(!d){calendarDays.appendChild(dayDiv); return;}
+    dayDiv.className="day"; dayDiv.innerHTML=d;
+    if(month.festivals[d]){const f=document.createElement("span");f.className="festival";f.textContent=month.festivals[d];dayDiv.appendChild(f);}
+    dayDiv.onclick = ()=>{
+      document.querySelectorAll(".day").forEach(dd=>dd.classList.remove("selected"));
+      dayDiv.classList.add("selected");
+      dateInput.value=`${d} ${month.name}`;
+      festivalInfo.textContent = month.festivals[d] || "";
+    };
+    calendarDays.appendChild(dayDiv);
+  });
+}
+document.getElementById("prevMonth").onclick = ()=>{if(currentMonthIndex>0){currentMonthIndex--;generateCalendar(currentMonthIndex);}};
+document.getElementById("nextMonth").onclick = ()=>{if(currentMonthIndex<months.length-1){currentMonthIndex++;generateCalendar(currentMonthIndex);}};
+generateCalendar(currentMonthIndex);
+</script>
+</body>
+</html>
