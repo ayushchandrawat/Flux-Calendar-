@@ -1,4 +1,4 @@
-![Calendar-Preview](Flux/Calendar.png)
+![Calendar-Preview](Calendar.png)
 🚀 Project Title & Tagline
 =========================
 ### Calendar Website 📆
